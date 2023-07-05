@@ -1,0 +1,6 @@
+/build/*
+/lib/*
+/api/*
+/impl/*
+GoogleChrome-quic.*
+/cert/out/*
