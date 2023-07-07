@@ -19,6 +19,9 @@ message("PROJECT_NAME = ${PROJECT_NAME}")
 # include(CTest)
 # enable_testing()
 
+
+add_executable(hello main.cpp)
+
 add_library( owt_web_transport
              SHARED
              IMPORTED )
@@ -26,9 +29,6 @@ add_library( owt_web_transport
 set_target_properties( owt_web_transport
                        PROPERTIES IMPORTED_LOCATION
                        ${CMAKE_CURRENT_SOURCE_DIR}/lib/libowt_web_transport.so )
-
-
-add_executable(hello main.cpp)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/api)
 
