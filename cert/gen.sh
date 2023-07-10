@@ -59,6 +59,6 @@ try openssl ca \
 
 try openssl pkcs12 -export -inkey out/leaf_cert.key -in out/leaf_cert.pem -out out/leaf_cert.p12 -password pass:hello
 
-try openssl x509 -pubkey -noout -in leaf_cert.pem | openssl rsa -pubin -outform der | openssl dgst -sha256 -binary | base64 > out/leaf_cert.pem.dgst
+try openssl x509 -pubkey -noout -in out/leaf_cert.pem | openssl rsa -pubin -outform der | openssl dgst -sha256 -binary | base64 > out/leaf_cert.pem.dgst
 
 chmod ugo+rwx -R ./out
