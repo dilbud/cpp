@@ -14,6 +14,11 @@
 #include "owt/quic/web_transport_definitions.h"
 #include "owt/quic/web_transport_stream_interface.h"
 
+#include "uv.h"
+#include "Peer.h"
+
+
+
 class StreamEchoVisitor
     : public owt::quic::WebTransportStreamInterface::Visitor {
    public:
@@ -172,9 +177,7 @@ class ServerEchoVisitor
   }
 };
 
-int main(int, char **)
-{
-
+void quicServer() {
     owt::quic::Logging::Severity(owt::quic::LoggingSeverity::kInfo);
     owt::quic::Logging::InitLogging();
 
@@ -213,6 +216,26 @@ int main(int, char **)
         //   }
         // }
     }
+}
 
+void aa(int &a) {
+    int b = a;
+    
+}
+
+int main(int, char **) {
+    std::string str("hello");
+    for (auto &&i : str) {
+        i = std::toupper(i);
+    }
+    std::printf("%s\n", str.c_str());
+
+    uv_loop_t *loop = uv_default_loop();
+
+    Peer p(loop);
+
+    uv_run(loop, UV_RUN_DEFAULT);
+    uv_loop_close(loop);
+    // quicServer();
     return 0;
 }

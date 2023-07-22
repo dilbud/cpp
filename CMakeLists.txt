@@ -1,12 +1,16 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.20.0)
 project(hello VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+set (TEST_SRT ON)
 
-message("CMAKE_PROJECT_NAME = ${CMAKE_PROJECT_NAME}")
-message("PROJECT_NAME = ${PROJECT_NAME}")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+message("-- DEV CMAKE_PROJECT_NAME = ${CMAKE_PROJECT_NAME}")
+message("-- DEV PROJECT_NAME = ${PROJECT_NAME}")
+message("-- DEV MODULE_PATH = ${CMAKE_MODULE_PATH}")
 
 # The compiled library code is here
 # add_subdirectory(src)
@@ -19,20 +23,20 @@ message("PROJECT_NAME = ${PROJECT_NAME}")
 # include(CTest)
 # enable_testing()
 
+# include(ExternalProject)
+# include(FetchContent)
 
-add_executable(hello main.cpp)
 
-add_library( owt_web_transport
-             SHARED
-             IMPORTED )
+add_subdirectory(extern)
+add_subdirectory(src)
+add_subdirectory(apps)
+add_subdirectory(tests)
 
-set_target_properties( owt_web_transport
-                       PROPERTIES IMPORTED_LOCATION
-                       ${CMAKE_CURRENT_SOURCE_DIR}/lib/libowt_web_transport.so )
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/api)
 
-target_link_libraries( ${PROJECT_NAME} owt_web_transport )
+
+
+
 
 # find_package(Doxygen)
 #   if(Doxygen_FOUND)

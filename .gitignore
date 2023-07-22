@@ -4,3 +4,6 @@
 /impl/*
 GoogleChrome-quic.*
 /cert/out/*
+
+*.so
+*.a
