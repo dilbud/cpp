@@ -1,6 +1,8 @@
 
 if (TEST_SRT)
-
+    find_package(Threads REQUIRED)
+    add_executable(main-srt main-srt.cpp)
+    target_link_libraries(main-srt SRTNet ${CMAKE_THREAD_LIBS_INIT})
 else()
     add_executable(main main.cpp)
     find_package(owt_web_transport REQUIRED)

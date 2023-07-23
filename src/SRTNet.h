@@ -21,7 +21,7 @@
 #include <any>
 #include <memory>
 
-#include "srtcore/srt.h"
+#include "srt.h"
 
 #ifdef WIN32
 #include <Winsock2.h>
