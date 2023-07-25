@@ -1,0 +1,3 @@
+add_executable(main_owt main_owt.cpp)
+find_package(owt_web_transport REQUIRED)
+target_link_libraries(main_owt owt_web_transport)

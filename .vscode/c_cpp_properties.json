@@ -3,7 +3,8 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "/usr/include/gstreamer-1.0/"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",

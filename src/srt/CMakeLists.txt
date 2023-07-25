@@ -1,0 +1,5 @@
+find_package(Threads REQUIRED)
+find_package(srt REQUIRED)
+add_library(SRTNet SRTNet.cpp)
+target_link_libraries(SRTNet srt ${CMAKE_THREAD_LIBS_INIT})
+target_include_directories(SRTNet INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})

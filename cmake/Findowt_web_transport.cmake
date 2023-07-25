@@ -16,3 +16,6 @@ set_target_properties( owt_web_transport
 target_include_directories( owt_web_transport
                             INTERFACE
                             ${CMAKE_SOURCE_DIR}/extern/header/owt_web_transport )
+
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(owt_web_transport DEFAULT_MSG)

@@ -5,12 +5,15 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set (TEST_SRT OFF)
+set (TEST_OWT OFF)
+set (TEST_UV OFF)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-message("-- DEV CMAKE_PROJECT_NAME = ${CMAKE_PROJECT_NAME}")
-message("-- DEV PROJECT_NAME = ${PROJECT_NAME}")
-message("-- DEV MODULE_PATH = ${CMAKE_MODULE_PATH}")
+message(STATUS "DEV -- CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE}")
+message(STATUS "DEV -- CMAKE_PROJECT_NAME = ${CMAKE_PROJECT_NAME}")
+message(STATUS "DEV -- PROJECT_NAME = ${PROJECT_NAME}")
+message(STATUS "DEV -- MODULE_PATH = ${CMAKE_MODULE_PATH}")
 
 # The compiled library code is here
 # add_subdirectory(src)
@@ -31,10 +34,6 @@ message("-- DEV MODULE_PATH = ${CMAKE_MODULE_PATH}")
 add_subdirectory(src)
 add_subdirectory(apps)
 add_subdirectory(tests)
-
-
-
-
 
 
 
