@@ -9,3 +9,7 @@ extern/srt/*
 
 *.so
 *.a
+
+pulseaudio*
+
+video_data/*

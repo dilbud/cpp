@@ -4,14 +4,22 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/usr/include/gstreamer-1.0/"
+                "/usr/include/gstreamer-1.0/",
+                "/usr/include/libmount/",
+                "/usr/include/blkid/",
+                "/usr/include/gstreamer-1.0/",
+                "/usr/include/orc-0.4/",
+                "/usr/include/gstreamer-1.0/",
+                "/usr/include/glib-2.0/",
+                "/usr/lib/x86_64-linux-gnu/glib-2.0/include/"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c17",
             "cppStandard": "c++14",
             "intelliSenseMode": "linux-clang-x64",
-            "configurationProvider": "ms-vscode.cpptools"
+            "configurationProvider": "ms-vscode.cpptools",
+            // "configurationProvider": "ms-vscode.cmake-tools"
         }
     ],
     "version": 4
