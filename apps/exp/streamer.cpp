@@ -1,5 +1,56 @@
 #include "streamer.h"
 
+
+static void pad_added_handler (GstElement *src, GstPad *new_pad, Streamer *data) {
+  GstPad *sink_pad = gst_element_get_static_pad (data->convert01, "sink");
+  GstPad *a_sink_pad = gst_element_get_static_pad (data->a_convert, "sink");
+  GstPadLinkReturn ret;
+  GstCaps *new_pad_caps = NULL;
+  GstStructure *new_pad_struct = NULL;
+  const gchar *new_pad_type = NULL;
+
+  g_print ("Received new pad '%s' from '%s':\n", GST_PAD_NAME (new_pad), GST_ELEMENT_NAME (src));
+
+  /* If our converter is already linked, we have nothing to do here */
+  if (gst_pad_is_linked (sink_pad) && gst_pad_is_linked (a_sink_pad)) {
+    g_print ("We are already linked. Ignoring.\n");
+    goto exit;
+  }
+
+  new_pad_caps = gst_pad_get_current_caps (new_pad);
+  new_pad_struct = gst_caps_get_structure (new_pad_caps, 0);
+  new_pad_type = gst_structure_get_name (new_pad_struct);
+
+  if (g_str_has_prefix(new_pad_type, "video/x-raw") &&
+      !gst_pad_is_linked(sink_pad)) {
+    ret = gst_pad_link(new_pad, sink_pad);
+    if (GST_PAD_LINK_FAILED(ret)) {
+        g_print("Type is '%s' but link failed.\n", new_pad_type);
+    } else {
+        g_print("Link succeeded (type '%s').\n", new_pad_type);
+    }
+  } else if (g_str_has_prefix(new_pad_type, "audio/x-raw") &&
+             !gst_pad_is_linked(a_sink_pad)) {
+    ret = gst_pad_link(new_pad, a_sink_pad);
+    if (GST_PAD_LINK_FAILED(ret)) {
+        g_print("Type is '%s' but link failed.\n", new_pad_type);
+    } else {
+        g_print("Link succeeded (type '%s').\n", new_pad_type);
+    }
+  }
+
+  /* Attempt the link */
+
+exit:
+  /* Unreference the new pad's caps, if we got them */
+  if (new_pad_caps != NULL)
+    gst_caps_unref (new_pad_caps);
+
+  /* Unreference the sink pad */
+  gst_object_unref (sink_pad);
+   gst_object_unref (a_sink_pad);
+}
+
 Streamer::Streamer(int argc, char *argv[]) {
     GstStateChangeReturn ret;
 
@@ -7,17 +58,30 @@ Streamer::Streamer(int argc, char *argv[]) {
     gst_init(&argc, &argv);
 
     /* Create the elements */
-    source = gst_element_factory_make("videotestsrc", "source01");
+    source = 
+        gst_element_factory_make ("uridecodebin", "source");
+        // gst_element_factory_make("videotestsrc", "source01");
+
+
     convert01 = gst_element_factory_make("videoconvert", "convert01");
     filter = gst_element_factory_make("vertigotv", "filter01");
     convert02 = gst_element_factory_make("videoconvert", "convert02");
     sink = gst_element_factory_make("autovideosink", "sink01");
+
+    a_convert = gst_element_factory_make("audioconvert", "convert");
+    a_resample = gst_element_factory_make("audioresample", "resample");
+    a_sink = gst_element_factory_make("autoaudiosink", "sink");
 
     /* Create the empty pipeline */
     pipeline = gst_pipeline_new("pipe");
 
     if (!pipeline || !source || !filter || !convert01 || !convert02 || !sink) {
         g_printerr("Not all elements could be created.\n");
+        goto END;
+    }
+
+    if (!a_convert || !a_resample || !a_sink) {
+        g_printerr("Not all 2 elements could be created.\n");
         goto END;
     }
 
@@ -30,12 +94,18 @@ Streamer::Streamer(int argc, char *argv[]) {
         convert02, 
         sink, 
         NULL);
+    gst_bin_add_many(
+        GST_BIN(pipeline), 
+        a_convert,
+        a_resample, 
+        a_sink,
+        NULL);
 
-    if (gst_element_link(source, convert01) != TRUE) {
-        g_printerr("Elements 01 could not be linked.\n");
-        gst_object_unref(pipeline);
-        goto END;
-    }
+    // if (gst_element_link(source, convert01) != TRUE) {
+    //     g_printerr("Elements 01 could not be linked.\n");
+    //     gst_object_unref(pipeline);
+    //     goto END;
+    // }
     if (gst_element_link(convert01, filter) != TRUE) {
         g_printerr("Elements 02 could not be linked.\n");
         gst_object_unref(pipeline);
@@ -52,8 +122,21 @@ Streamer::Streamer(int argc, char *argv[]) {
         goto END;
     }
 
+    if (gst_element_link(a_convert, a_resample) != TRUE) {
+        g_printerr("Elements 05 could not be linked.\n");
+        gst_object_unref(pipeline);
+        goto END;
+    }
+
+    if (gst_element_link(a_resample, a_sink) != TRUE) {
+        g_printerr("Elements 06 could not be linked.\n");
+        gst_object_unref(pipeline);
+        goto END;
+    }
+
     /* Modify the source's properties */
-    g_object_set(source, "pattern", 0, NULL);
+    g_object_set(source, "uri", "file:///workspaces/cpp/video_data/sintel-short.mp4", NULL);
+    g_signal_connect(source, "pad-added", G_CALLBACK (pad_added_handler), this);
 
     /* Start playing */
     ret = gst_element_set_state(pipeline, GST_STATE_PLAYING);
@@ -65,9 +148,10 @@ Streamer::Streamer(int argc, char *argv[]) {
 
     /* Wait until error or EOS */
     bus = gst_element_get_bus(pipeline);
+    g_printerr("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.\n");
     msg = gst_bus_timed_pop_filtered(bus, GST_CLOCK_TIME_NONE,
                                      GstMessageType (GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
-
+g_printerr("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh.\n");
     /* Parse message */
     if (msg != NULL) {
         GError *err;

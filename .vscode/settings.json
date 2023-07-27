@@ -53,5 +53,8 @@
         "ratio": "cpp",
         "regex": "cpp",
         "shared_mutex": "cpp"
-    }
+    },
+    "cSpell.enableFiletypes": [
+        "cmake"
+    ]
 }
