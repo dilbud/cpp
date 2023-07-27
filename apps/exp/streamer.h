@@ -18,5 +18,7 @@ class Streamer {
 
     GstBus *bus;
     GstMessage *msg;
+
+    gboolean terminate = FALSE;
 };
 

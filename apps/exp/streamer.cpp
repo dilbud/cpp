@@ -1,54 +1,54 @@
 #include "streamer.h"
 
+static void pad_added_handler(GstElement *src, GstPad *new_pad,
+                              Streamer *data) {
+    GstPad *sink_pad = gst_element_get_static_pad(data->convert01, "sink");
+    GstPad *a_sink_pad = gst_element_get_static_pad(data->a_convert, "sink");
+    GstPadLinkReturn ret;
+    GstCaps *new_pad_caps = NULL;
+    GstStructure *new_pad_struct = NULL;
+    const gchar *new_pad_type = NULL;
 
-static void pad_added_handler (GstElement *src, GstPad *new_pad, Streamer *data) {
-  GstPad *sink_pad = gst_element_get_static_pad (data->convert01, "sink");
-  GstPad *a_sink_pad = gst_element_get_static_pad (data->a_convert, "sink");
-  GstPadLinkReturn ret;
-  GstCaps *new_pad_caps = NULL;
-  GstStructure *new_pad_struct = NULL;
-  const gchar *new_pad_type = NULL;
+    g_print("Received new pad '%s' from '%s':\n", GST_PAD_NAME(new_pad),
+            GST_ELEMENT_NAME(src));
 
-  g_print ("Received new pad '%s' from '%s':\n", GST_PAD_NAME (new_pad), GST_ELEMENT_NAME (src));
-
-  /* If our converter is already linked, we have nothing to do here */
-  if (gst_pad_is_linked (sink_pad) && gst_pad_is_linked (a_sink_pad)) {
-    g_print ("We are already linked. Ignoring.\n");
-    goto exit;
-  }
-
-  new_pad_caps = gst_pad_get_current_caps (new_pad);
-  new_pad_struct = gst_caps_get_structure (new_pad_caps, 0);
-  new_pad_type = gst_structure_get_name (new_pad_struct);
-
-  if (g_str_has_prefix(new_pad_type, "video/x-raw") &&
-      !gst_pad_is_linked(sink_pad)) {
-    ret = gst_pad_link(new_pad, sink_pad);
-    if (GST_PAD_LINK_FAILED(ret)) {
-        g_print("Type is '%s' but link failed.\n", new_pad_type);
-    } else {
-        g_print("Link succeeded (type '%s').\n", new_pad_type);
+    /* If our converter is already linked, we have nothing to do here */
+    if (gst_pad_is_linked(sink_pad) && gst_pad_is_linked(a_sink_pad)) {
+        g_print("We are already linked. Ignoring.\n");
+        goto exit;
     }
-  } else if (g_str_has_prefix(new_pad_type, "audio/x-raw") &&
-             !gst_pad_is_linked(a_sink_pad)) {
-    ret = gst_pad_link(new_pad, a_sink_pad);
-    if (GST_PAD_LINK_FAILED(ret)) {
-        g_print("Type is '%s' but link failed.\n", new_pad_type);
-    } else {
-        g_print("Link succeeded (type '%s').\n", new_pad_type);
-    }
-  }
 
-  /* Attempt the link */
+    new_pad_caps = gst_pad_get_current_caps(new_pad);
+    new_pad_struct = gst_caps_get_structure(new_pad_caps, 0);
+    new_pad_type = gst_structure_get_name(new_pad_struct);
+
+    if (g_str_has_prefix(new_pad_type, "video/x-raw") &&
+        !gst_pad_is_linked(sink_pad)) {
+        ret = gst_pad_link(new_pad, sink_pad);
+        if (GST_PAD_LINK_FAILED(ret)) {
+            g_print("Type is '%s' but link failed.\n", new_pad_type);
+        } else {
+            g_print("Link succeeded (type '%s').\n", new_pad_type);
+        }
+    } else if (g_str_has_prefix(new_pad_type, "audio/x-raw") &&
+               !gst_pad_is_linked(a_sink_pad)) {
+        ret = gst_pad_link(new_pad, a_sink_pad);
+        if (GST_PAD_LINK_FAILED(ret)) {
+            g_print("Type is '%s' but link failed.\n", new_pad_type);
+        } else {
+            g_print("Link succeeded (type '%s').\n", new_pad_type);
+        }
+    }
+
+    /* Attempt the link */
 
 exit:
-  /* Unreference the new pad's caps, if we got them */
-  if (new_pad_caps != NULL)
-    gst_caps_unref (new_pad_caps);
+    /* Unreference the new pad's caps, if we got them */
+    if (new_pad_caps != NULL) gst_caps_unref(new_pad_caps);
 
-  /* Unreference the sink pad */
-  gst_object_unref (sink_pad);
-   gst_object_unref (a_sink_pad);
+    /* Unreference the sink pad */
+    gst_object_unref(sink_pad);
+    gst_object_unref(a_sink_pad);
 }
 
 Streamer::Streamer(int argc, char *argv[]) {
@@ -58,10 +58,8 @@ Streamer::Streamer(int argc, char *argv[]) {
     gst_init(&argc, &argv);
 
     /* Create the elements */
-    source = 
-        gst_element_factory_make ("uridecodebin", "source");
-        // gst_element_factory_make("videotestsrc", "source01");
-
+    source = gst_element_factory_make("uridecodebin", "source");
+    // gst_element_factory_make("videotestsrc", "source01");
 
     convert01 = gst_element_factory_make("videoconvert", "convert01");
     filter = gst_element_factory_make("vertigotv", "filter01");
@@ -86,20 +84,9 @@ Streamer::Streamer(int argc, char *argv[]) {
     }
 
     /* Build the pipeline */
-    gst_bin_add_many(
-        GST_BIN(pipeline), 
-        source, 
-        convert01,
-        filter, 
-        convert02, 
-        sink, 
-        NULL);
-    gst_bin_add_many(
-        GST_BIN(pipeline), 
-        a_convert,
-        a_resample, 
-        a_sink,
-        NULL);
+    gst_bin_add_many(GST_BIN(pipeline), source, convert01, filter, convert02,
+                     sink, NULL);
+    gst_bin_add_many(GST_BIN(pipeline), a_convert, a_resample, a_sink, NULL);
 
     // if (gst_element_link(source, convert01) != TRUE) {
     //     g_printerr("Elements 01 could not be linked.\n");
@@ -135,8 +122,9 @@ Streamer::Streamer(int argc, char *argv[]) {
     }
 
     /* Modify the source's properties */
-    g_object_set(source, "uri", "file:///workspaces/cpp/video_data/sintel-short.mp4", NULL);
-    g_signal_connect(source, "pad-added", G_CALLBACK (pad_added_handler), this);
+    g_object_set(source, "uri",
+                 "file:///workspaces/cpp/video_data/sintel-short.mp4", NULL);
+    g_signal_connect(source, "pad-added", G_CALLBACK(pad_added_handler), this);
 
     /* Start playing */
     ret = gst_element_set_state(pipeline, GST_STATE_PLAYING);
@@ -149,37 +137,53 @@ Streamer::Streamer(int argc, char *argv[]) {
     /* Wait until error or EOS */
     bus = gst_element_get_bus(pipeline);
     g_printerr("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.\n");
-    msg = gst_bus_timed_pop_filtered(bus, GST_CLOCK_TIME_NONE,
-                                     GstMessageType (GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
-g_printerr("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh.\n");
-    /* Parse message */
-    if (msg != NULL) {
-        GError *err;
-        gchar *debug_info;
+    do {
+        msg = gst_bus_timed_pop_filtered(
+            bus, GST_CLOCK_TIME_NONE,
+            GstMessageType(GST_MESSAGE_STATE_CHANGED | GST_MESSAGE_ERROR |
+                           GST_MESSAGE_EOS));
+        g_printerr("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh.\n");
+        /* Parse message */
+        if (msg != NULL) {
+            GError *err;
+            gchar *debug_info;
 
-        switch (GST_MESSAGE_TYPE(msg)) {
-            case GST_MESSAGE_ERROR:
-                gst_message_parse_error(msg, &err, &debug_info);
-                g_printerr("Error received from element %s: %s\n",
-                           GST_OBJECT_NAME(msg->src), err->message);
-                g_printerr("Debugging information: %s\n",
-                           debug_info ? debug_info : "none");
-                g_clear_error(&err);
-                g_free(debug_info);
-                break;
-            case GST_MESSAGE_EOS:
-                g_print("End-Of-Stream reached.\n");
-                break;
-            default:
-                /* We should not reach here because we only asked for ERRORs and
-                 * EOS */
-                g_printerr("Unexpected message received.\n");
-                break;
+            switch (GST_MESSAGE_TYPE(msg)) {
+                case GST_MESSAGE_ERROR:
+                    gst_message_parse_error(msg, &err, &debug_info);
+                    g_printerr("Error received from element %s: %s\n",
+                               GST_OBJECT_NAME(msg->src), err->message);
+                    g_printerr("Debugging information: %s\n",
+                               debug_info ? debug_info : "none");
+                    g_clear_error(&err);
+                    g_free(debug_info);
+                    terminate = TRUE;
+                    break;
+                case GST_MESSAGE_EOS:
+                    g_print("End-Of-Stream reached.\n");
+                    terminate = TRUE;
+                    break;
+                case GST_MESSAGE_STATE_CHANGED:
+                    /* We are only interested in state-changed messages from the
+                     * pipeline */
+                    if (GST_MESSAGE_SRC(msg) == GST_OBJECT(pipeline)) {
+                        GstState old_state, new_state, pending_state;
+                        gst_message_parse_state_changed(
+                            msg, &old_state, &new_state, &pending_state);
+                        g_print("Pipeline state changed from %s to %s:\n",
+                                gst_element_state_get_name(old_state),
+                                gst_element_state_get_name(new_state));
+                    }
+                    break;
+                default:
+                    /* We should not reach here */
+                    g_printerr("Unexpected message received.\n");
+                    break;
+            }
+            gst_message_unref(msg);
         }
-        gst_message_unref(msg);
-        goto END;
-    }
-    END:;
+    } while (!terminate);
+END:;
 }
 
 Streamer::~Streamer() {
