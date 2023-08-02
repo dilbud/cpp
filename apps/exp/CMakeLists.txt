@@ -18,13 +18,14 @@ if(
     target_link_libraries( main_exp 
         ${Boost_LIBRARIES} 
         ${gst_LIBRARIES} 
-        ffmpeg
+        ${ffmpeg_LIBRARIES} 
     )
-    message(STATUS "${gst_INCLUDE_DIRS}")
+    # message(STATUS "${gst_INCLUDE_DIRS}")
     target_include_directories(main_exp 
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
         PUBLIC ${Boost_INCLUDE_DIRS} 
-        PUBLIC ${gst_INCLUDE_DIRS} )
+        PUBLIC ${gst_INCLUDE_DIRS}
+        PUBLIC ${ffmpeg_INCLUDE_DIRS} )
 else()
     message(STATUS "Lib NOT FOUND")
 endif()

@@ -127,11 +127,16 @@ Streamer::Streamer(int argc, char *argv[]) {
     source = gst_element_factory_make("uridecodebin", "source");
     // gst_element_factory_make("videotestsrc", "source01");
 
+    // video
     convert01 = gst_element_factory_make("videoconvert", "convert01");
-    filter = gst_element_factory_make("vertigotv", "filter01");
+    filter = gst_element_factory_make(
+        // "vertigotv", 
+        "navseek",
+        "filter01");
     convert02 = gst_element_factory_make("videoconvert", "convert02");
     sink = gst_element_factory_make("autovideosink", "sink01");
 
+    // audio
     a_convert = gst_element_factory_make("audioconvert", "convert");
     a_resample = gst_element_factory_make("audioresample", "resample");
     a_sink = gst_element_factory_make("autoaudiosink", "sink");

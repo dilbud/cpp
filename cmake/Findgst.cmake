@@ -10,6 +10,7 @@ pkg_check_modules(gst
     gstreamer-video-1.0>=1.4
 )
 
+# message(STATUS "${gst_INCLUDE_DIRS}")
 # message(STATUS "${gst_LINK_LIBRARIES}")
 
 include(FindPackageHandleStandardArgs)
