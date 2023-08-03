@@ -7,6 +7,11 @@ class Streamer {
     static void pad_added_handler(GstElement *src, GstPad *new_pad, Streamer *data);
     static void handle_message(Streamer *data, GstMessage *msg);
 
+    static gboolean print_field(GQuark field, const GValue *value, gpointer pfx);
+    static void print_caps(const GstCaps *caps, const gchar *pfx);
+    static void print_pad_templates_information(GstElementFactory *factory);
+    static void print_pad_capabilities(GstElement *element, gchar *pad_name);
+
    private:
     GstElement *pipeline;
 

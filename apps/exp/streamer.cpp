@@ -1,7 +1,7 @@
 #include "streamer.h"
 
 /* Functions below print the Capabilities in a human-friendly format */
-static gboolean print_field(GQuark field, const GValue *value, gpointer pfx) {
+gboolean Streamer::print_field(GQuark field, const GValue *value, gpointer pfx) {
     gchar *str = gst_value_serialize(value);
 
     g_print("%s  %15s: %s\n", (gchar *)pfx, g_quark_to_string(field), str);
@@ -9,7 +9,7 @@ static gboolean print_field(GQuark field, const GValue *value, gpointer pfx) {
     return TRUE;
 }
 
-static void print_caps(const GstCaps *caps, const gchar *pfx) {
+void Streamer::print_caps(const GstCaps *caps, const gchar *pfx) {
     guint i;
 
     g_return_if_fail(caps != NULL);
@@ -32,7 +32,7 @@ static void print_caps(const GstCaps *caps, const gchar *pfx) {
 }
 
 /* Prints information about a Pad Template, including its Capabilities */
-static void print_pad_templates_information(GstElementFactory *factory) {
+void Streamer::print_pad_templates_information(GstElementFactory *factory) {
     const GList *pads;
     GstStaticPadTemplate *padtemplate;
 
@@ -78,7 +78,7 @@ static void print_pad_templates_information(GstElementFactory *factory) {
 }
 
 /* Shows the CURRENT capabilities of the requested pad in the given element */
-static void print_pad_capabilities(GstElement *element, gchar *pad_name) {
+void Streamer::print_pad_capabilities(GstElement *element, gchar *pad_name) {
     GstPad *pad = NULL;
     GstCaps *caps = NULL;
 
