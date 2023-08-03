@@ -9,6 +9,10 @@ class Streamer {
 
    private:
     GstElement *pipeline;
+
+    GstElementFactory *source_factory;
+    GstElementFactory *sink_factory;
+
     GstElement *source;
     GstElement *filter;
     GstElement *convert01;

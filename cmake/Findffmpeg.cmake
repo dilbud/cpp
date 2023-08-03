@@ -7,6 +7,7 @@ pkg_check_modules(ffmpeg REQUIRED IMPORTED_TARGET
     libswresample
     libswscale
     libavutil
+    libpostproc
 )
 
 # message(STATUS "${ffmpeg_INCLUDE_DIRS}")

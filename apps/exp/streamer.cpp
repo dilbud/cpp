@@ -1,5 +1,106 @@
 #include "streamer.h"
 
+/* Functions below print the Capabilities in a human-friendly format */
+static gboolean print_field(GQuark field, const GValue *value, gpointer pfx) {
+    gchar *str = gst_value_serialize(value);
+
+    g_print("%s  %15s: %s\n", (gchar *)pfx, g_quark_to_string(field), str);
+    g_free(str);
+    return TRUE;
+}
+
+static void print_caps(const GstCaps *caps, const gchar *pfx) {
+    guint i;
+
+    g_return_if_fail(caps != NULL);
+
+    if (gst_caps_is_any(caps)) {
+        g_print("%sANY\n", pfx);
+        return;
+    }
+    if (gst_caps_is_empty(caps)) {
+        g_print("%sEMPTY\n", pfx);
+        return;
+    }
+
+    for (i = 0; i < gst_caps_get_size(caps); i++) {
+        GstStructure *structure = gst_caps_get_structure(caps, i);
+
+        g_print("%s%s\n", pfx, gst_structure_get_name(structure));
+        gst_structure_foreach(structure, print_field, (gpointer)pfx);
+    }
+}
+
+/* Prints information about a Pad Template, including its Capabilities */
+static void print_pad_templates_information(GstElementFactory *factory) {
+    const GList *pads;
+    GstStaticPadTemplate *padtemplate;
+
+    g_print("Pad Templates for %s:\n",
+            gst_element_factory_get_longname(factory));
+    if (!gst_element_factory_get_num_pad_templates(factory)) {
+        g_print("  none\n");
+        return;
+    }
+
+    pads = gst_element_factory_get_static_pad_templates(factory);
+    while (pads) {
+        padtemplate = (GstStaticPadTemplate*)(pads->data);
+        pads = g_list_next(pads);
+
+        if (padtemplate->direction == GST_PAD_SRC)
+            g_print("  SRC template: '%s'\n", padtemplate->name_template);
+        else if (padtemplate->direction == GST_PAD_SINK)
+            g_print("  SINK template: '%s'\n", padtemplate->name_template);
+        else
+            g_print("  UNKNOWN!!! template: '%s'\n",
+                    padtemplate->name_template);
+
+        if (padtemplate->presence == GST_PAD_ALWAYS)
+            g_print("    Availability: Always\n");
+        else if (padtemplate->presence == GST_PAD_SOMETIMES)
+            g_print("    Availability: Sometimes\n");
+        else if (padtemplate->presence == GST_PAD_REQUEST)
+            g_print("    Availability: On request\n");
+        else
+            g_print("    Availability: UNKNOWN!!!\n");
+
+        if (padtemplate->static_caps.string) {
+            GstCaps *caps;
+            g_print("    Capabilities:\n");
+            caps = gst_static_caps_get(&padtemplate->static_caps);
+            print_caps(caps, "      ");
+            gst_caps_unref(caps);
+        }
+
+        g_print("\n");
+    }
+}
+
+/* Shows the CURRENT capabilities of the requested pad in the given element */
+static void print_pad_capabilities(GstElement *element, gchar *pad_name) {
+    GstPad *pad = NULL;
+    GstCaps *caps = NULL;
+
+    /* Retrieve pad */
+    pad = gst_element_get_static_pad(element, pad_name);
+    if (!pad) {
+        g_printerr("Could not retrieve pad '%s'\n", pad_name);
+        return;
+    }
+
+    /* Retrieve negotiated caps (or acceptable caps if negotiation is not
+     * finished yet) */
+    caps = gst_pad_get_current_caps(pad);
+    if (!caps) caps = gst_pad_query_caps(pad, NULL);
+
+    /* Print and free */
+    g_print("Caps for the %s pad:\n", pad_name);
+    print_caps(caps, "      ");
+    gst_caps_unref(caps);
+    gst_object_unref(pad);
+}
+
 void Streamer::handle_message(Streamer *data, GstMessage *msg) {
     GError *err;
     gchar *debug_info;
@@ -32,6 +133,11 @@ void Streamer::handle_message(Streamer *data, GstMessage *msg) {
                         gst_element_state_get_name(old_state),
                         gst_element_state_get_name(new_state));
 
+                g_print("--------------------------------------------\n");
+                print_pad_capabilities(data->source, (gchar *)"src");
+                g_print("--------------------------------------------\n");
+                print_pad_capabilities(data->sink, (gchar *)"sink");
+                g_print("--------------------------------------------\n");
                 /* Remember whether we are in the PLAYING state or not */
                 data->playing = (new_state == GST_STATE_PLAYING);
 
@@ -124,7 +230,15 @@ Streamer::Streamer(int argc, char *argv[]) {
     gst_init(&argc, &argv);
 
     /* Create the elements */
-    source = gst_element_factory_make("uridecodebin", "source");
+    source_factory = gst_element_factory_find ("uridecodebin");
+    if (!source_factory) {
+        g_printerr("Not all element factories could be created.\n");
+        goto END;
+    }
+    g_print("--------------------------------------------\n");
+    print_pad_templates_information (source_factory);
+    g_print("--------------------------------------------\n");
+    source = gst_element_factory_create (source_factory, "source");
     // gst_element_factory_make("videotestsrc", "source01");
 
     // video
@@ -134,7 +248,18 @@ Streamer::Streamer(int argc, char *argv[]) {
         "navseek",
         "filter01");
     convert02 = gst_element_factory_make("videoconvert", "convert02");
-    sink = gst_element_factory_make("autovideosink", "sink01");
+
+    sink_factory = gst_element_factory_find("autovideosink");
+    if (!sink_factory) {
+        g_printerr("Not all element factories could be created.\n");
+        goto END;
+    }
+    g_print("--------------------------------------------\n");
+    print_pad_templates_information(sink_factory);
+    g_print("--------------------------------------------\n");
+    sink = gst_element_factory_create(sink_factory, "sink01");
+
+    // sink = gst_element_factory_make("autovideosink", "sink01");
 
     // audio
     a_convert = gst_element_factory_make("audioconvert", "convert");
@@ -197,6 +322,15 @@ Streamer::Streamer(int argc, char *argv[]) {
                  "file:///workspaces/cpp/video_data/sintel-short.mp4", NULL);
     g_signal_connect(source, "pad-added", G_CALLBACK(pad_added_handler), this);
 
+    g_print("--------------------------------------------\n");
+    g_print("--------------------------------------------\n");
+    g_print("--------------------------------------------\n");
+    print_pad_capabilities(convert01, (gchar*)"src");
+    g_print("--------------------------------------------\n");
+    print_pad_capabilities(source, (gchar*)"src");
+    g_print("--------------------------------------------\n");
+    print_pad_capabilities(sink, (gchar*)"sink");
+    g_print("--------------------------------------------\n");
     /* Start playing */
     ret = gst_element_set_state(pipeline, GST_STATE_PLAYING);
     if (ret == GST_STATE_CHANGE_FAILURE) {
