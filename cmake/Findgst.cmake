@@ -8,6 +8,7 @@ pkg_check_modules(gst
     gstreamer-sdp-1.0>=1.4
     gstreamer-app-1.0>=1.4 
     gstreamer-video-1.0>=1.4
+    gstreamer-audio-1.0>=1.4
 )
 
 # message(STATUS "${gst_INCLUDE_DIRS}")
