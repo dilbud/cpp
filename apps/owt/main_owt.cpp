@@ -122,7 +122,7 @@ class SessionEchoVisitor
             default:
                 std::printf("Unknown\n");
         }
-        const char *ch = "dddddddddddd";
+        // const char *ch = "dddddddddddd";
         owt::quic::WebTransportStreamInterface *bistream =
             session_->CreateBidirectionalStream();
         StreamEchoVisitor *visitor = new StreamEchoVisitor(session_, bistream);
@@ -206,20 +206,19 @@ void quicServer() {
         std::printf("server terminated\n");
     }
     while (true) {
-        if (sv->SessionVisitors().size() > 0) {
-            std::printf("session size: %lu\n", sv->SessionVisitors().size());
-            
-            // if (!isc) {
-            //     std::string s = std::string("sgfsdfsdf");
-            //     owt::quic::WebTransportStreamInterface *bis =
-            //         sv->Sessions().front()->CreateBidirectionalStream();
-            //     if (bis->CanWrite()) {
-            //         bis->Write((unsigned char *)s.c_str(), s.size());
-            //         //   std::printf("write %ld\n", rs);
-            //     }
-            //     isc = true;
-            // }
-        }
+        // if (sv->SessionVisitors().size() > 0) {
+        //     std::printf("session size: %lu\n", sv->SessionVisitors().size());
+        //     // if (!isc) {
+        //     //     std::string s = std::string("sgfsdfsdf");
+        //     //     owt::quic::WebTransportStreamInterface *bis =
+        //     //         sv->Sessions().front()->CreateBidirectionalStream();
+        //     //     if (bis->CanWrite()) {
+        //     //         bis->Write((unsigned char *)s.c_str(), s.size());
+        //     //         //   std::printf("write %ld\n", rs);
+        //     //     }
+        //     //     isc = true;
+        //     // }
+        // }
     }
 }
 
