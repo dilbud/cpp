@@ -6,9 +6,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_compile_options(-Wall)
 set (TEST_SRT OFF)
-set (TEST_OWT OFF)
+set (TEST_OWT ON)
 set (TEST_UV OFF)
-set (TEST_EXP ON)
+set (TEST_EXP OFF)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 

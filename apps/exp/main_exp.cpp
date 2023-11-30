@@ -1075,6 +1075,10 @@ static gboolean handle_keyboardMultiLang (GIOChannel *source, GIOCondition cond,
 
 ////////////////////////////////////////////////////////////////////
 
+int main_Subtitle(int argc, char *argv[]) {
+  
+}
+
 
 int main(int argc, char ** argv) {
     // char* pp = argv[0];
@@ -1107,6 +1111,7 @@ int main(int argc, char ** argv) {
     // main_info(argc, argv);
     // main_stream(argc, argv);
     // main_speed(argc, argv);
-    main_MultiLang(argc, argv);
+    // main_MultiLang(argc, argv);
+    main_Subtitle(argc, argv);
     return 0;
 }
