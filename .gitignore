@@ -6,6 +6,7 @@ GoogleChrome-quic.*
 /cert/out/*
 
 extern/srt/*
+extern/google/*
 
 *.so
 *.a
