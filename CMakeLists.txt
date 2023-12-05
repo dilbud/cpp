@@ -6,47 +6,52 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_compile_options(-Wall)
 set (TEST_SRT OFF)
-set (TEST_OWT ON)
+set (TEST_OWT OFF)
 set (TEST_UV OFF)
 set (TEST_EXP OFF)
+set (TEST_LEN ON)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+if(NOT TEST_LEN)
+    list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-message(STATUS "DEV -- CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE}")
-message(STATUS "DEV -- CMAKE_PROJECT_NAME = ${CMAKE_PROJECT_NAME}")
-message(STATUS "DEV -- PROJECT_NAME = ${PROJECT_NAME}")
-message(STATUS "DEV -- MODULE_PATH = ${CMAKE_MODULE_PATH}")
+    message(STATUS "DEV -- CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE}")
+    message(STATUS "DEV -- CMAKE_PROJECT_NAME = ${CMAKE_PROJECT_NAME}")
+    message(STATUS "DEV -- PROJECT_NAME = ${PROJECT_NAME}")
+    message(STATUS "DEV -- MODULE_PATH = ${CMAKE_MODULE_PATH}")
 
-# The compiled library code is here
-# add_subdirectory(src)
+    # The compiled library code is here
+    # add_subdirectory(src)
 
-# The executable code is here
-# add_subdirectory(apps)
-
-
-
-# include(CTest)
-# enable_testing()
-
-# include(ExternalProject)
-# include(FetchContent)
-
-
-# add_subdirectory(extern)
-add_subdirectory(src)
-add_subdirectory(apps)
-add_subdirectory(tests)
+    # The executable code is here
+    # add_subdirectory(apps)
 
 
 
-# find_package(Doxygen)
-#   if(Doxygen_FOUND)
-#     add_subdirectory(docs)
-#   else()
-#     message(STATUS "Doxygen not found, not building docs")
-# endif()
+    # include(CTest)
+    # enable_testing()
+
+    # include(ExternalProject)
+    # include(FetchContent)
 
 
-# set(CPACK_PROJECT_NAME ${PROJECT_NAME})
-# set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
-# include(CPack)
+    # add_subdirectory(extern)
+    add_subdirectory(src)
+    add_subdirectory(apps)
+    add_subdirectory(tests)
+
+
+
+    # find_package(Doxygen)
+    #   if(Doxygen_FOUND)
+    #     add_subdirectory(docs)
+    #   else()
+    #     message(STATUS "Doxygen not found, not building docs")
+    # endif()
+
+
+    # set(CPACK_PROJECT_NAME ${PROJECT_NAME})
+    # set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
+    # include(CPack)
+else()
+    add_subdirectory(learn)
+endif()
