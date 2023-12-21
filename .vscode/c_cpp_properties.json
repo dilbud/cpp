@@ -15,10 +15,10 @@
                 "${workspaceFolder}/extern/ffmpeg/fftools"
             ],
             "defines": [],
-            "compilerPath": "/usr/bin/clang",
+            "compilerPath": "/usr/bin/gcc",
             "cStandard": "c17",
-            "cppStandard": "c++14",
-            "intelliSenseMode": "linux-clang-x64",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "linux-gcc-x64",
             "configurationProvider": "ms-vscode.cpptools"
         }
     ],

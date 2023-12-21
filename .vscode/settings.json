@@ -69,9 +69,17 @@
         "cfenv": "cpp",
         "cinttypes": "cpp",
         "typeindex": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "*.inc": "cpp",
+        "forward_list": "cpp",
+        "unordered_set": "cpp",
+        "scoped_allocator": "cpp",
+        "valarray": "cpp",
+        "codecvt": "cpp",
+        "format": "cpp"
     },
     "cSpell.enableFiletypes": [
         "cmake"
-    ]
+    ],
+    "sonarlint.pathToCompileCommands": "${workspaceFolder}/build/compile_commands.json"
 }
