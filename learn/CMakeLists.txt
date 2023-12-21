@@ -1,1 +1,1 @@
-add_executable(main_len main_len.cpp)
+add_subdirectory(apps)

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20.0)
-project(hello VERSION 0.1.0)
+project(hello VERSION 0.1.0 DESCRIPTION "test cpp" LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -11,7 +11,10 @@ set (TEST_UV OFF)
 set (TEST_EXP OFF)
 set (TEST_LEN ON)
 
-if(NOT TEST_LEN)
+if(TEST_LEN)
+    add_subdirectory(learn)
+else()
+
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
     message(STATUS "DEV -- CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE}")
@@ -52,6 +55,4 @@ if(NOT TEST_LEN)
     # set(CPACK_PROJECT_NAME ${PROJECT_NAME})
     # set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
     # include(CPack)
-else()
-    add_subdirectory(learn)
 endif()

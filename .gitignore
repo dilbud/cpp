@@ -5,8 +5,12 @@
 GoogleChrome-quic.*
 /cert/out/*
 
-extern/srt/*
-extern/google/*
+/extern/ffmpeg/*
+/extern/srt/*
+/extern/google/*
+/extern/lib/*
+/extern/quiche/*
+/extern/uv/*
 
 *.so
 *.a
