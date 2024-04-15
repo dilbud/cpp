@@ -11,7 +11,7 @@ extern "C" {
 
 #include "ThreadPool.h"
 
-int main() {
+void testThreadPool() {
     ThreadPool pool;
 
     std::vector<std::future<size_t>> vec;
@@ -32,6 +32,9 @@ int main() {
     for (size_t i = 0; i < max; i++) {
         std::printf("%zd\n", vec.at(i).get());
     }
+}
 
+int main() {
+    testThreadPool();
     return 0;
 }
