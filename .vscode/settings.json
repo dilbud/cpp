@@ -76,7 +76,12 @@
         "scoped_allocator": "cpp",
         "valarray": "cpp",
         "codecvt": "cpp",
-        "format": "cpp"
+        "format": "cpp",
+        "compare": "cpp",
+        "concepts": "cpp",
+        "numbers": "cpp",
+        "semaphore": "cpp",
+        "stop_token": "cpp"
     },
     "cSpell.enableFiletypes": [
         "cmake"
