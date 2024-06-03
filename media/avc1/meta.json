@@ -1,0 +1,15 @@
+{
+    "decoderConfig": {
+        "codec": "avc1.4d002a",
+        "codedHeight": 306,
+        "codedWidth": 720,
+        "colorSpace": {
+            "fullRange": false,
+            "matrix": "smpte170m",
+            "primaries": "smpte170m",
+            "transfer": "smpte170m"
+        },
+        "description": {},
+        "hardwareAcceleration": "no-preference"
+    }
+}

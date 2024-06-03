@@ -10,6 +10,8 @@ set (TEST_OWT OFF)
 set (TEST_UV OFF)
 set (TEST_EXP OFF)
 set (TEST_LEN ON)
+set (WTP_SRC OFF)
+
 
 if(TEST_LEN)
     add_subdirectory(learn)

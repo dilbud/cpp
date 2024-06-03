@@ -1,0 +1,14 @@
+{
+    "decoderConfig": {
+        "codec": "vp8",
+        "codedHeight": 306,
+        "codedWidth": 720,
+        "colorSpace": {
+            "fullRange": false,
+            "matrix": "smpte170m",
+            "primaries": "smpte170m",
+            "transfer": "smpte170m"
+        },
+        "hardwareAcceleration": "no-preference"
+    }
+}
