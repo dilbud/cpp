@@ -22,3 +22,4 @@ cpp learning
 ## use chrome as gest and bypass cert to add Shortcut Properties target
 * --guest  --test-type --origin-to-force-quic-on=localhost:8500 --ignore-certificate-errors-spki-list=2RtYQI8GxZ4WGEsnQaggTyRmca1dP5SY3Qfy+Mj+WMM=
 * --guest  --test-type --origin-to-force-quic-on=localhost:8500 --ignore-certificate-errors=FC59HXxaraNfDfd4zLhXnm4fqachtmJhXJajUyoyQ4U=
+* "C:\Program Files\Google\Chrome\Application\chrome.exe" --guest  --test-type --origin-to-force-quic-on=localhost:9500 --ignore-certificate-errors-spki-list=v0gRqTihy+2CTG/z7dfyIoaN5jiEz5PW8TEpoAJijX8=
