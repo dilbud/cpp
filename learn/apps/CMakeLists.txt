@@ -13,4 +13,14 @@ pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET
     libavutil
 )
 
-target_link_libraries(app PkgConfig::LIBAV)
+pkg_check_modules(LIB_EVENT2 REQUIRED IMPORTED_TARGET
+    libevent_core
+    libevent
+    libevent_pthreads
+    libevent_extra
+    libevent_openssl
+)
+
+include_directories(${LIBEVENT_INCLUDE_DIRS})
+
+target_link_libraries(app PkgConfig::LIBAV PkgConfig::LIB_EVENT2 ${LIBEVENT_LIBRARIES})
