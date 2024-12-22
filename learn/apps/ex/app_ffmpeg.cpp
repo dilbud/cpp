@@ -327,27 +327,6 @@ int save_frame_as_jpeg(AVFrame *pFrame, int curFrameNumber) {
     return 0;
 }
 
-int save_as_ppm(AVFrame *pFrame, int curFrameNumber) {
-    unsigned char *buf;
-    int wrap;
-    int xsize;
-    int ysize;
-
-    FILE *f;
-    int i;
-    char fName[256];
-    // sprintf(fName, "/workspaces/cpp/media/vp8/dvr-%06d.jpg", curFrameNumber);
-
-    f = fopen(fName, "wb");
-    fprintf(f, "P6\n%d %d\n%d\n", xsize, ysize, 255);
-
-    for (i = 0; i < ysize; i++) {
-        fwrite(buf + i * wrap, 1, xsize * 3, f);
-    }
-
-    fclose(f);
-}
-
 static int output_video_frame_2(AVFrame *frame, AppContext_2 *appCtx, int curFrameNumber) {
     if (frame->width != appCtx->param->width || frame->height != appCtx->param->height) {
         /* To handle this change, one could call av_image_alloc again and
