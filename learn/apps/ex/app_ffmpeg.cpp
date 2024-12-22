@@ -336,7 +336,7 @@ int save_as_ppm(AVFrame *pFrame, int curFrameNumber) {
     FILE *f;
     int i;
     char fName[256];
-    sprintf(fName, "/workspaces/cpp/media/vp8/dvr-%06d.jpg", curFrameNumber);
+    // sprintf(fName, "/workspaces/cpp/media/vp8/dvr-%06d.jpg", curFrameNumber);
 
     f = fopen(fName, "wb");
     fprintf(f, "P6\n%d %d\n%d\n", xsize, ysize, 255);
@@ -366,6 +366,60 @@ static int output_video_frame_2(AVFrame *frame, AppContext_2 *appCtx, int curFra
 
     return 0;
 }
+
+void save_frame_as_jpeg(AVFrame *pFrame, int width, int height, int iFrame) {
+    AVCodec *jpegCodec = avcodec_find_encoder(AV_CODEC_ID_MJPEG);
+    if (!jpegCodec) {
+        fprintf(stderr, "MJPEG codec not found\n");
+        return;
+    }
+    AVCodecContext *jpegContext = avcodec_alloc_context3(jpegCodec);
+    if (!jpegContext) {
+        fprintf(stderr, "Could not allocate JPEG codec context\n");
+        return;
+    }
+    jpegContext->pix_fmt = AV_PIX_FMT_YUVJ420P;
+    jpegContext->height = height;
+    jpegContext->width = width;
+    jpegContext->time_base = (AVRational){1, 25};
+    if (avcodec_open2(jpegContext, jpegCodec, NULL) < 0) {
+        fprintf(stderr, "Could not open JPEG codec\n");
+        avcodec_free_context(&jpegContext);
+        return;
+    }
+    AVPacket *packet = av_packet_alloc();
+    if (!packet) {
+        fprintf(stderr, "Could not allocate AVPacket\n");
+        avcodec_free_context(&jpegContext);
+        return;
+    }
+    if (avcodec_send_frame(jpegContext, pFrame) < 0) {
+        fprintf(stderr, "Error sending frame to codec\n");
+        av_packet_free(&packet);
+        avcodec_free_context(&jpegContext);
+        return;
+    }
+    if (avcodec_receive_packet(jpegContext, packet) == 0) {
+        char filename[64];
+        // snprintf(filename, sizeof(filename), "frame%03d.jpg", iFrame);
+        snprintf(filename, sizeof(filename), "/workspaces/cpp/media/vp8/%s_%03d.jpg", "test", iFrame);
+        // snprintf(filename, sizeof(filename), "/workspaces/cpp/media/vp8/%s_%03d.jpg", "test", iFrame);
+        FILE *jpegFile = fopen(filename, "wb");
+        if (jpegFile) {
+            fwrite(packet->data, 1, packet->size, jpegFile);
+            fclose(jpegFile);
+            printf("Saved %s\n", filename);
+        } else {
+            fprintf(stderr, "Could not open %s\n", filename);
+        }
+        av_packet_unref(packet);
+    } else {
+        fprintf(stderr, "Error encoding frame\n");
+    }
+    av_packet_free(&packet);
+    avcodec_free_context(&jpegContext);
+}
+
 // Save RGB image as PPM file format
 static void ppm_save(unsigned char *buf, int wrap, int xsize, int ysize, char *filename) {
     FILE *f;
@@ -398,6 +452,12 @@ static int decode_packet_2(AVCodecContext *dec, const AVPacket *pkt, AppContext_
     if (sws_ctx == nullptr) {
         return -1;
     }
+
+    struct SwsContext *sws_ctxJpj = sws_getContext(dec->width, dec->height, dec->pix_fmt, dec->width, dec->height,
+                                                   AV_PIX_FMT_YUV420P, SWS_BILINEAR, NULL, NULL, NULL);
+    if (!sws_ctx) {
+        return -1;
+    }
     // Allocate frame for storing image converted to RGB.
     ////////////////////////////////////////////////////////////////////////////
     AVFrame *pRGBFrame = av_frame_alloc();
@@ -406,11 +466,27 @@ static int decode_packet_2(AVCodecContext *dec, const AVPacket *pkt, AppContext_
     pRGBFrame->width = dec->width;
     pRGBFrame->height = dec->height;
 
-    sts = av_frame_get_buffer(pRGBFrame, 0);
+    {
+        sts = av_frame_get_buffer(pRGBFrame, 0);
 
-    if (sts < 0) {
-        return -1;
+        if (sts < 0) {
+            return -1;
+        }
     }
+
+    AVFrame *pFrameYUV = av_frame_alloc();
+    pFrameYUV->format = AV_PIX_FMT_YUV420P;
+    pFrameYUV->color_range = dec->color_range;
+    pFrameYUV->width = dec->width;
+    pFrameYUV->height = dec->height;
+    {
+        sts = av_frame_get_buffer(pFrameYUV, 0);
+
+        if (sts < 0) {
+            return -1;
+        }
+    }
+
     ////////////////////////////////////////////////////////////////////////////
 
     // get all the available frames from the decoder
@@ -443,6 +519,12 @@ static int decode_packet_2(AVCodecContext *dec, const AVPacket *pkt, AppContext_
             std::printf("%d\n", appCtx->frame->key_frame);
             snprintf(buf, sizeof(buf), "/workspaces/cpp/media/vp8/%s_%03d.ppm", "test", dec->frame_number);
             ppm_save(pRGBFrame->data[0], pRGBFrame->linesize[0], pRGBFrame->width, pRGBFrame->height, buf);
+        }
+
+        {
+            sws_scale(sws_ctxJpj, appCtx->frame->data, appCtx->frame->linesize, 0, appCtx->frame->height, pFrameYUV->data,
+                      pFrameYUV->linesize);
+            save_frame_as_jpeg(pFrameYUV, pFrameYUV->width, pFrameYUV->height, dec->frame_number);
         }
 
         av_frame_unref(appCtx->frame);
