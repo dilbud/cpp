@@ -1,7 +1,14 @@
-add_executable(app app.cpp)
+# add_executable(app app.cpp)
+
+### for chunk
+add_executable(app ./chunk/app_ffmpeg_chnuk.cpp)
+
+### for ex
 # add_executable(app ./ex/app_ffmpeg.cpp)
 # target_sources(app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ThreadPool.cpp )
-target_include_directories(app PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+### for app
+# target_include_directories(app PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET 
