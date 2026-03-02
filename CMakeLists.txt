@@ -9,10 +9,15 @@ set (TEST_SRT OFF)
 set (TEST_OWT OFF)
 set (TEST_UV OFF)
 set (TEST_EXP OFF)
-set (TEST_LEN ON)
+set (TEST_LEN OFF)
 set (WTP_SRC OFF)
 set (LEARN_CPP_PRIMER OFF)
+set (TEST_APP OFF)
+set (LEARN_AERON ON)
 
+if(LEARN_AERON) 
+    add_subdirectory(learn_aeron)
+endif()
 
 if(LEARN_CPP_PRIMER) 
     add_subdirectory(learn_cpp_primer)
@@ -20,7 +25,9 @@ endif()
 
 if(TEST_LEN)
     add_subdirectory(learn)
-else()
+endif()
+
+if(TEST_APP)
 
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
